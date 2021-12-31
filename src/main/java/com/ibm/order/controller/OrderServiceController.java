@@ -30,8 +30,9 @@ public class OrderServiceController {
 		 if(requestTokenHeader != null && !requestTokenHeader.equalsIgnoreCase("") && requestTokenHeader.startsWith("Bearer "))
 		 {
 			String token = requestTokenHeader.substring(7);
-			log.info("Incoming token"+ token);
+			log.info("Incoming token : "+ token);
 			int orderId = orderService.initiateOrder(request.getUserName(), token);
+			log.info("Order id : "+ orderId);
 			return ResponseEntity.status(HttpStatus.OK).body(new InitiateOrderResponseBody("Success","Order initiated",orderId));
 		 }
 		 else
