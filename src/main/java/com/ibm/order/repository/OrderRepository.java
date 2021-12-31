@@ -9,4 +9,5 @@ import com.ibm.order.entity.Order;
 public interface OrderRepository extends JpaRepository<Order,Integer>{
 
 	Order findByOrderId(int orderId);
+	Order findByUserIdAndUserToken(int userId,String userToken);
 }

@@ -3,10 +3,10 @@ package com.ibm.order.client;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.ibm.order.exception.InvalidTokenException;
-import com.ibm.order.exception.ProductNotFoundException;
+
+
 import com.ibm.order.exception.TokenValidationException;
-import com.ibm.order.model.ProductServiceResponseBody;
+
 import com.ibm.order.model.ValidateTokenRequestBody;
 import com.ibm.order.model.ValidateTokenResponseBody;
 
@@ -19,12 +19,12 @@ public class LoginServiceClient {
 	public ValidateTokenResponseBody validateToken(String token,String userName) {
 		try {
 			String url = "http://localhost:8080/validate";
-			log.debug("Target URL :"+url);
+			log.info("Target URL :"+url);
 			ValidateTokenRequestBody request = new ValidateTokenRequestBody(userName,token);
-			log.debug("Validate token request  : "+request.toString());
+			log.info("Validate token request  : Token : "+request.getToken()+"Username : "+request.getUserName());
 			RestTemplate restTemplate = new RestTemplate();
 			ValidateTokenResponseBody response = restTemplate.postForObject(url,request,ValidateTokenResponseBody.class);
-			log.debug("Validate token response  : "+response.toString());
+			log.info("Validate token response userid : "+response.getUserId()+" isValid : "+response.isValid());
 			return response;
 			}
 			catch(Exception e)

@@ -9,9 +9,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.ibm.order.exception.InvalidTokenException;
 import com.ibm.order.exception.OrderNotFoundException;
+import com.ibm.order.exception.PreviousTransactionActiveException;
 import com.ibm.order.exception.ProductNotFoundException;
 import com.ibm.order.exception.TokenValidationException;
 import com.ibm.order.exception.TransactionExpiredException;
+import com.ibm.order.exception.TransactionInactiveException;
 import com.ibm.order.model.ErrorResponse;
 
 @RestControllerAdvice
@@ -48,5 +50,19 @@ public class OrderServiceAdvice {
 	public ResponseEntity<ErrorResponse> handleTokenValidationException(TokenValidationException e)
 	{
 		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ErrorResponse("Error", "Token could not be validated", new Date()));
+	}
+	
+	
+	@ExceptionHandler(PreviousTransactionActiveException.class)
+	public ResponseEntity<ErrorResponse> handlePreviousTransactionActiveException(PreviousTransactionActiveException e)
+	{
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("Error", "Previous transaction is already active", new Date()));
+	}
+	
+	
+	@ExceptionHandler(TransactionInactiveException.class)
+	public ResponseEntity<ErrorResponse> handleTransactionInactiveException(TransactionInactiveException e)
+	{
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("Error", "Transaction is inactive"+e.getLocalizedMessage(), new Date()));
 	}
 }
