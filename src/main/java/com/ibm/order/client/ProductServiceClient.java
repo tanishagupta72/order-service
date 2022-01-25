@@ -13,7 +13,7 @@ public class ProductServiceClient {
 
 	public ProductServiceResponseBody getProductById(int productId) {
 	try {
-		String url = "http://localhost:8100/productById/" + productId;
+		String url = "http://product-service/productById/" + productId;
 		System.out.println("Target URL :"+url);
 		RestTemplate restTemplate = new RestTemplate();
 		ProductServiceResponseBody response = restTemplate.getForObject(url,ProductServiceResponseBody.class);

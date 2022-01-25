@@ -18,7 +18,7 @@ public class LoginServiceClient {
 
 	public ValidateTokenResponseBody validateToken(String token,String userName) {
 		try {
-			String url = "http://localhost:8080/validate";
+			String url = "http://login-service/validate";
 			log.info("Target URL :"+url);
 			ValidateTokenRequestBody request = new ValidateTokenRequestBody(userName,token);
 			log.info("Validate token request  : Token : "+request.getToken()+"Username : "+request.getUserName());

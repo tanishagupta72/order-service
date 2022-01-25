@@ -1,6 +1,7 @@
 package com.ibm.order.service;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -69,6 +70,10 @@ public class OrderService {
 	{
 		log.info("Entering in receiveOrder");
 		ReceiveOrderResponseBody response = new ReceiveOrderResponseBody();
+		double itemTotal = 0;
+		List<ProductServiceResponseBody> productList = new ArrayList();
+		int productsReceived = request.size();
+		int productsNotFound = 0;
 		if(isTransactionActive(orderId))
 		{
 				
@@ -88,14 +93,16 @@ public class OrderService {
 					itemList.setCretTs(new Date());
 					itemList.setUpdtTs(new Date());
 					itemList.setProductName(productResponse.getProductName());
-					double itemTotal = o.getQuantity()*productResponse.getPrice();
+					itemTotal = itemTotal + o.getQuantity()*productResponse.getPrice();
 					itemList.setItemTotal(itemTotal);
 					itemRepo.save(itemList);
+					productList.add(new ProductServiceResponseBody(productResponse.getProductId(),productResponse.getProductName(),o.getQuantity(),o.getQuantity()*productResponse.getPrice()));
 					
-					
-					response.setStatus("SUCCESS");
-					response.setDescription("Quantity available : "+o.getQuantity());
-					response.setItemTotal(itemTotal);
+					/*
+					 * response.setStatus("SUCCESS");
+					 * response.setDescription("Quantity available : "+o.getQuantity());
+					 * response.setItemTotal(itemTotal);
+					 */
 					}
 					else if((availableQuantity < o.getQuantity()) && availableQuantity>0)
 					{
@@ -105,24 +112,46 @@ public class OrderService {
 						itemList.setProductId(o.getProductId());
 						itemList.setQuantity(availableQuantity);
 						itemList.setProductName(productResponse.getProductName());
-						double itemTotal = availableQuantity*productResponse.getPrice();
+						itemTotal = itemTotal + availableQuantity*productResponse.getPrice();
 						itemList.setItemTotal(itemTotal);
 						itemRepo.save(itemList);
-						
-						response.setStatus("SUCCESS");
-						response.setDescription("Quantity available : "+availableQuantity);
-						response.setItemTotal(itemTotal);
-						
+						productList.add(new ProductServiceResponseBody(productResponse.getProductId(),productResponse.getProductName(),availableQuantity,availableQuantity*productResponse.getPrice()));
+						/*
+						 * response.setStatus("SUCCESS");
+						 * response.setDescription("Quantity available : "+availableQuantity);
+						 * response.setItemTotal(itemTotal);
+						 */
 					}
 					else
 					{
-						response.setStatus("FAILED");
-						response.setDescription("Product out of stock");
-						response.setItemTotal(0);
-						
+						/*
+						 * response.setStatus("FAILED");
+						 * response.setDescription("Product out of stock"); response.setItemTotal(0);
+						 */
+						productList.add(new ProductServiceResponseBody(productResponse.getProductId(),productResponse.getProductName(),availableQuantity,availableQuantity*productResponse.getPrice()));
 					}
 				}
-			}log.info("Exiting from in receiveOrder");
+				else {
+					productsNotFound++;
+					
+				}
+				
+			}
+				if(productsReceived==productsNotFound)
+				{
+					response.setStatus("FAILED");
+					response.setItemTotal(itemTotal);
+					response.setDescription("No products found");
+					
+				}
+				else
+				{
+					response.setStatus("SUCCESS");
+					response.setItemTotal(itemTotal);
+					response.setDescription("No. of products found : "+(productsReceived - productsNotFound));
+					response.setProductList(productList);
+				}
+			log.info("Exiting from in receiveOrder");
 		}
 		else
 		{

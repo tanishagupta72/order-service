@@ -2,6 +2,8 @@ package com.ibm.order.model;
 
 
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
@@ -20,6 +22,9 @@ public class ReceiveOrderResponseBody {
 	
 	@JsonProperty("Description")
 	private String description;
+	
+	@JsonProperty("ProductList")
+	private List<ProductServiceResponseBody> productList;
 	
 	@JsonProperty("Itemtotal")
 	private double itemTotal;
