@@ -71,6 +71,7 @@ public class OrderService {
 		log.info("Entering in receiveOrder");
 		ReceiveOrderResponseBody response = new ReceiveOrderResponseBody();
 		double itemTotal = 0;
+		double orderTotal = 0;
 		List<ProductServiceResponseBody> productList = new ArrayList();
 		int productsReceived = request.size();
 		int productsNotFound = 0;
@@ -93,16 +94,12 @@ public class OrderService {
 					itemList.setCretTs(new Date());
 					itemList.setUpdtTs(new Date());
 					itemList.setProductName(productResponse.getProductName());
-					itemTotal = itemTotal + o.getQuantity()*productResponse.getPrice();
+					itemTotal =  o.getQuantity()*productResponse.getPrice();
 					itemList.setItemTotal(itemTotal);
 					itemRepo.save(itemList);
 					productList.add(new ProductServiceResponseBody(productResponse.getProductId(),productResponse.getProductName(),o.getQuantity(),o.getQuantity()*productResponse.getPrice()));
+					orderTotal = orderTotal + itemTotal;
 					
-					/*
-					 * response.setStatus("SUCCESS");
-					 * response.setDescription("Quantity available : "+o.getQuantity());
-					 * response.setItemTotal(itemTotal);
-					 */
 					}
 					else if((availableQuantity < o.getQuantity()) && availableQuantity>0)
 					{
@@ -112,22 +109,15 @@ public class OrderService {
 						itemList.setProductId(o.getProductId());
 						itemList.setQuantity(availableQuantity);
 						itemList.setProductName(productResponse.getProductName());
-						itemTotal = itemTotal + availableQuantity*productResponse.getPrice();
+						itemTotal =  availableQuantity*productResponse.getPrice();
 						itemList.setItemTotal(itemTotal);
 						itemRepo.save(itemList);
 						productList.add(new ProductServiceResponseBody(productResponse.getProductId(),productResponse.getProductName(),availableQuantity,availableQuantity*productResponse.getPrice()));
-						/*
-						 * response.setStatus("SUCCESS");
-						 * response.setDescription("Quantity available : "+availableQuantity);
-						 * response.setItemTotal(itemTotal);
-						 */
+						orderTotal = orderTotal + itemTotal;
 					}
 					else
 					{
-						/*
-						 * response.setStatus("FAILED");
-						 * response.setDescription("Product out of stock"); response.setItemTotal(0);
-						 */
+						
 						productList.add(new ProductServiceResponseBody(productResponse.getProductId(),productResponse.getProductName(),availableQuantity,availableQuantity*productResponse.getPrice()));
 					}
 				}
@@ -140,14 +130,14 @@ public class OrderService {
 				if(productsReceived==productsNotFound)
 				{
 					response.setStatus("FAILED");
-					response.setItemTotal(itemTotal);
+					response.setItemTotal(orderTotal);
 					response.setDescription("No products found");
 					
 				}
 				else
 				{
 					response.setStatus("SUCCESS");
-					response.setItemTotal(itemTotal);
+					response.setItemTotal(orderTotal);
 					response.setDescription("No. of products found : "+(productsReceived - productsNotFound));
 					response.setProductList(productList);
 				}
